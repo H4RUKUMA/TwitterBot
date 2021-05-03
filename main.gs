@@ -1,23 +1,22 @@
 //--TWITTER--//
 var twitter = TwitterWebService.getInstance(
-  'DNfga2j048wsurseDhZi31KyA',//API Key
-  'YO3KphJpLNqFeKfkESLp6ypHzgjVjCUekVAloEGFZUiWq1Al4s'//API secret key
+  'fJVnyY70t0WobIjwL1sttkKK2',//API Key
+  'cpTO24b2fCeo5JgEhYwfXTRnEJwJbhNTonpjn0ZAWuklcwgb8D'//API secret key
 );
-function authorize() {twitter.authorize();}
-function reset() {twitter.reset();}
+function authorize_Twitter() {twitter.authorize();}
+function reset_Twitter() {twitter.reset();}
 function authCallback(request) { return twitter.authCallback(request); }
 
 //--SPOTIFY--//
-//ACCESS_TOKEN = BQDpVNnMxFp_SJHGiJ5PvN5bFcRS0Il7TkcDBYMgTCMZmV12FQt8JlNtc6Osy5rzwJfYGVc3GWd2E2vVIRkmCSSa66cnzrYyyBCgzekdYsmwCjKA7dbLkut-IzhpYDVA_ONjurWWTzgGKTw-88trySdSGaAWNYXJTaamLqjggazRVZRbah8_uA
-const client_id = '728c5521241e4841b181a99c66d3c147'
-const client_secretId = 'a405338eed17448595259b28db9e35ac'
+var client_id = '728c5521241e4841b181a99c66d3c147';
+var client_secretid = 'a405338eed17448595259b28db9e35ac';
 var refresh_token = "AQDZx7TWwJmTwp1G9KYsx8zW7MSSzEjaPZptopY8cjEuXsec14cJOAkZTIVvG9hToPfrDoTGkHu6YJxUQ7eNhpUQjaowjDMGluvKbvmfsw3YtZOLqccXSUSs2_gWnrjWzPg"
 var username = "22z2yadt4usyzwtbfz6rlpwhy"
 
-function getToken() {
+function getToken_Spotify() {
   var endpoint = 'https://accounts.spotify.com/api/token'
 
-  var encode = Utilities.base64Encode(client_id+":"+client_secretId, Utilities.Charset.UTF_8)
+  var encode = Utilities.base64Encode(client_id+":"+client_secretid, Utilities.Charset.UTF_8)
   var options = {
     'method': 'post',
     'contentType': 'application/x-www-form-urlencoded',
@@ -37,4 +36,24 @@ function getToken() {
   return JSON.parse(content).access_token
 }
 
+function getNewReleasedAlbums(token,offset) {
+  var endpoint = 'https://api.spotify.com/v1/browse/new-releases?country=JP&limit=1&offset=' + offset
+  var options = {
+    'method': 'get',
+    'headers': {
+      'Authorization': 'Bearer ' + token
+    }
+  }
+  var response = UrlFetchApp.fetch(endpoint, options)
+  var json=JSON.parse(response.getContentText());
+  var artist = json["albums"]["items"][0]["artists"][0]["name"]
+  Logger.log("Artist: "+ artist)
+  Logger.log(response)
+}
+
+function tweet() {
+  var token = getToken_Spotify()
+  var offset = String(Math.floor(Math.random() * 100))
+  var uri = getNewReleasedAlbums(token,offset)
+}
 
