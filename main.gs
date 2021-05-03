@@ -1,3 +1,6 @@
+var ss = SpreadsheetApp.openById("186-1WTpRg3rJGxq5QwTBQ9eNh10aC4ohy29ZW2zByxw");
+var sheet = ss.getSheetByName("Test");
+
 //--TWITTER--//
 var twitter = TwitterWebService.getInstance(
   'fJVnyY70t0WobIjwL1sttkKK2',//API Key
@@ -45,15 +48,33 @@ function getNewReleasedAlbums(token,offset) {
     }
   }
   var response = UrlFetchApp.fetch(endpoint, options)
-  var json=JSON.parse(response.getContentText());
-  var artist = json["albums"]["items"][0]["artists"][0]["name"]
-  Logger.log("Artist: "+ artist)
   Logger.log(response)
+  var json = JSON.parse(response.getContentText());
+  var artist_name = json["albums"]["items"][0]["artists"][0]["name"]
+  var album_name = json["albums"]["items"][0]["name"]
+  var album_url = json["albums"]["items"][0]["external_urls"]["spotify"]
+  var image_url = json["albums"]["items"][0]["images"][0]["url"]
+  
+  var res = UrlFetchApp.fetch(image_url);
+  var image = res.getBlob();
+
+  var info = [artist_name, album_name, album_url,image_url,image]
+
+  return info
 }
+
 
 function tweet() {
   var token = getToken_Spotify()
   var offset = String(Math.floor(Math.random() * 100))
-  var uri = getNewReleasedAlbums(token,offset)
+  var info = getNewReleasedAlbums(token,offset)
+  
+  Logger.log(info)
+  var text = info[0] + " / " + info[1] + "\n" + info[2]
+  var service  = twitter.getService();
+  var response = service.fetch('https://api.twitter.com/1.1/statuses/update.json', {
+    method: 'post',
+    payload: { status: text }
+  });
 }
 
