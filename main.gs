@@ -71,18 +71,20 @@ function getNewAlbumInfo(token, id) {
   var url = json["external_urls"]["spotify"]
 
   var info = {"artist_name":artist_name, "album_name":album_name,"popularity":popularity,"release_date":release_date,"upc":upc,"url":url};
-  Logger.log(response)
   Logger.log(info)
   return info
 }
 
 function tweetNewAlbum() {
   var token = getToken_Spotify()
-  var offset = String(Math.floor(Math.random() * 100))
-  var id = getNewAlbumId(token, offset)
-  var info = getNewAlbumInfo(token, id)
-  
-  var text = "-新着音楽-"+"\n"+"【リリース日】" + info.release_date + "\n" + "【人気度】" + info.popularity + "\n" + info.album_name + " / " + info.artist_name + "\n" + info.url
+
+  do {
+    var offset = String(Math.floor(Math.random() * 100))
+    var id = getNewAlbumId(token, offset)
+    var info = getNewAlbumInfo(token, id)
+    var text = "-新着音楽-"+"\n"+"【リリース日】" + info.release_date + "\n" + "【人気度】" + info.popularity + "\n" + info.album_name + " / " + info.artist_name + "\n" + info.url
+  } while (info.popularity <= 35)
+
   var service  = twitter.getService();
   Logger.log(text)
   var response = service.fetch('https://api.twitter.com/1.1/statuses/update.json', {
