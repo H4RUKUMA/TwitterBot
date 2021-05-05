@@ -1,3 +1,4 @@
+//--SHEET---//
 var ss = SpreadsheetApp.openById("186-1WTpRg3rJGxq5QwTBQ9eNh10aC4ohy29ZW2zByxw");
 var docSheet = ss.getSheetByName("DOC");
 var analyzeSheet = ss.getSheetByName("Analyze");
@@ -71,10 +72,10 @@ function tweetNewAlbum() {
     var offset = String(Math.floor(Math.random() * 100))
     var id = getNewAlbumId(token, offset)
     var info = getNewAlbumInfo(token, id)
-    var text = "-新着音楽-"+"\n"+"【リリース日】" + info.release_date + "\n" + "【人気度】" + info.popularity + "\n" + info.album_name + " / " + info.artist_name + "\n" + info.url
   } while (info.popularity <= 35)
-
-   var tw_id1 = tweet(text)
+  var hashtag = "#" + String(info.artist_name).replace(/[\s\t\n]/g,"");
+  var text = "-新着音楽-"+"\n"+"【リリース日】" + info.release_date + "\n" + "【人気度】" + info.popularity + "\n" + info.album_name + " / " + info.artist_name + "\n" + hashtag + "\n" + info.url
+  var tw_id1 = tweet(text)
   var parameters = createAnalyzeGraph(token,String(id),info.popularity,info.album_name,info.artist_name)
   var chart_blob = parameters.chart_blob
   
@@ -95,7 +96,6 @@ function getNewAlbumId(token, offset) {
     }
   }
   var response = UrlFetchApp.fetch(endpoint, options)
-  // Logger.log("getNewAlbumID \n" + response)
   var json = JSON.parse(response.getContentText());
   var id = String(json["albums"]["items"][0]["id"])
   
@@ -175,17 +175,7 @@ function analyze(token,album_id) {
   var track_length = Number(json["total"])
   var info = []
   var track_id = []
-  var danceability = []
-  var energy = []
-  var key = []
-  var loudness = []
-  var speechiness = []
-  var acousticness = []
-  var instrumentalness = []
-  var liveness = []
-  var valence = []
-  var tempo = []
-  var duration_ms = []
+  var danceability = [], energy = [], key = [], loudness = [], speechiness = [], acousticness = [], instrumentalness = [], liveness = [], valence = [], tempo = [], duration_ms = []
   for(i = 0; i < track_length; i++) {
     if (String(json["items"][i]["is_playable"]) == "true") {
       track_id[i] = String(json["items"][i]["id"])
@@ -203,7 +193,6 @@ function analyze(token,album_id) {
       duration_ms[i] = info[i].duration_ms
     } else {}
   }
-  
   var danceability_avr = Math.round(mathematics.average(danceability))
   var energy_avr = Math.round(mathematics.average(energy))
   var acousticness_avr = Math.round(mathematics.average(acousticness))
@@ -240,8 +229,7 @@ function analyzeTrack(token, id) {
   var tempo = json["audio_features"][0]["tempo"]
   var duration_ms = json["audio_features"][0]["duration_ms"]
 
-  var keyArray = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-  var modeArray = ["minor","major"]
+  var keyArray = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"], modeArray = ["minor","major"]
   var key = keyArray[keyNum] + " " + modeArray[modeNum]
 
   var info = [danceability,energy,key,loudness,speechiness,acousticness,instrumentalness,liveness,valence,tempo]
@@ -249,6 +237,3 @@ function analyzeTrack(token, id) {
 
   return info
 }
-
-
-
