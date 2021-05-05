@@ -237,3 +237,13 @@ function analyzeTrack(token, id) {
 
   return info
 }
+
+//--TESTING--//
+function test() {
+  var result = scraping("ummmm")
+  Logger.log(result)
+}
+
+function scraping(searchWord) {
+  
+}
